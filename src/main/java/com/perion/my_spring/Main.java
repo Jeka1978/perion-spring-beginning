@@ -5,7 +5,10 @@ package com.perion.my_spring;
  */
 public class Main {
     public static void main(String[] args) {
-        IRobot iRobot = new IRobot();
+
+//        new ApplicationContext().getObject(IRobot.class).cleanRoom();
+
+        IRobot iRobot = ObjectFactory.getInstance().createObject(IRobot.class);
         iRobot.cleanRoom();
     }
 }
