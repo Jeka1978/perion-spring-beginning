@@ -4,8 +4,12 @@ import lombok.SneakyThrows;
 import org.reflections.Reflections;
 
 import javax.annotation.PostConstruct;
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @author Evgeny Borisov
@@ -14,6 +18,7 @@ public class ObjectFactory {
     private static ObjectFactory instance = new ObjectFactory();
     private Config config = new JavaConfig();
     private List<ObjectConfigurator> configurators = new ArrayList<>();
+    private List<ProxyConfigurator> proxyConfigurators = new ArrayList<>();
 
 
     private Reflections scanner = new Reflections("com.perion");
@@ -21,6 +26,20 @@ public class ObjectFactory {
 
     @SneakyThrows
     public ObjectFactory() {
+        fillConfigurators();
+        fillProxyConfigurators();
+    }
+
+    private void fillProxyConfigurators() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
+        Set<Class<? extends ProxyConfigurator>> classes = scanner.getSubTypesOf(ProxyConfigurator.class);
+        for (Class<? extends ProxyConfigurator> aClass : classes) {
+            if (!Modifier.isAbstract(aClass.getModifiers())) {
+                proxyConfigurators.add(aClass.getDeclaredConstructor().newInstance());
+            }
+        }
+    }
+
+    private void fillConfigurators() throws InstantiationException, IllegalAccessException, InvocationTargetException, NoSuchMethodException {
         Set<Class<? extends ObjectConfigurator>> classes = scanner.getSubTypesOf(ObjectConfigurator.class);
         for (Class<? extends ObjectConfigurator> aClass : classes) {
             if (!Modifier.isAbstract(aClass.getModifiers())) {
@@ -44,34 +63,23 @@ public class ObjectFactory {
 
         runInitMethods(type, t);
 
+        t = wrapWithProxy(type, t);
 
-        //todo refactor => extract this code to some proxy configurer
         //todo support for @Benchmark above method
         // think about wrapping object factory with additional layer (ApplicationContext)
         //write @Singleton annotation and support ite
 
 
-        if (type.isAnnotationPresent(Benchmark.class)) {
-            return (T) Proxy.newProxyInstance(type.getClassLoader(), type.getInterfaces(), new InvocationHandler() {
-                @Override
-                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    System.out.println("*********BENCHAMRK STARTED FOR METHOD "+method.getName()+" ****************");
-                    long start = System.nanoTime();
-                    Object retVal = method.invoke(t, args);
-                    long end = System.nanoTime();
-                    System.out.println(end-start);
-                    System.out.println("*********BENCHAMRK ENDED FOR METHOD "+method.getName()+" ****************");
-
-                    return retVal;
-                }
-            });
-        }
-
-
-
         return t;
 
 
+    }
+
+    private <T> T wrapWithProxy(Class<T> type, T t) {
+        for (ProxyConfigurator proxyConfigurator : proxyConfigurators) {
+            t = (T) proxyConfigurator.replaceWithProxyIfNeeded(t, type);
+        }
+        return t;
     }
 
     private <T> void runInitMethods(Class<T> type, T t) throws IllegalAccessException, InvocationTargetException {
