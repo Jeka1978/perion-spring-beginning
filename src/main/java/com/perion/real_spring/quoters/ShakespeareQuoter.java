@@ -2,13 +2,14 @@ package com.perion.real_spring.quoters;
 
 import com.perion.my_spring.InjectRandomInt;
 import lombok.Setter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 /**
  * @author Evgeny Borisov
  */
-@Component
+@Book
 public class ShakespeareQuoter implements Quoter {
     @Setter
     @Value("${shake}")

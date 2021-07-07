@@ -2,6 +2,7 @@ package com.perion.real_spring.quoters;
 
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -16,7 +17,7 @@ import static java.util.Arrays.asList;
 public class TalkingRobot {
 
 
-    @Autowired
+    @Book
     private List<Quoter> quoters;
 
 

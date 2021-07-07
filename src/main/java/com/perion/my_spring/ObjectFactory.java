@@ -65,7 +65,6 @@ public class ObjectFactory {
 
         t = wrapWithProxy(type, t);
 
-        //todo support for @Benchmark above method
         // think about wrapping object factory with additional layer (ApplicationContext)
         //write @Singleton annotation and support ite
 
