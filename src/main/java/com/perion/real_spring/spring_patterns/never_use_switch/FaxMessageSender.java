@@ -5,10 +5,15 @@ import org.springframework.stereotype.Component;
 /**
  * @author Evgeny Borisov
  */
-@Component("fax")
+@Component
 public class FaxMessageSender implements MessageSender {
     @Override
     public void send(Message message) {
         System.out.println("SENT BY FAX");
+    }
+
+    @Override
+    public String myType() {
+        return FAX;
     }
 }
