@@ -17,13 +17,16 @@ import static java.util.Arrays.asList;
 public class TalkingRobot {
 
 
-    @Book
+    @Autowired
     private List<Quoter> quoters;
 
 
     @PostConstruct
+    @Secured
     public void talk() {
         quoters.forEach(Quoter::sayQuote);
     }
+
+    public void sayBlabla(){}
 
 }

@@ -1,5 +1,7 @@
 package com.perion.real_spring.spring_profiles_example;
 
+import com.perion.real_spring.quoters.Quoter;
+import com.perion.real_spring.quoters.TerminatorQuoter;
 import org.springframework.context.annotation.*;
 
 import java.util.Random;
@@ -10,6 +12,11 @@ import java.util.Random;
 @Configuration
 @ComponentScan
 public class MainConfig {
+
+
+
+
+
 
     @Bean
     public Random random(){

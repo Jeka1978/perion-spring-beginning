@@ -14,8 +14,9 @@ import java.util.Random;
 public class ScreenSaverConf {
 
 
+
     @Bean
-    @Scope("prototype")
+    @Scope(value = "twoSeconds",proxyMode = ScopedProxyMode.TARGET_CLASS)
     public Color color(){
         return new Color(random().nextInt(255), random().nextInt(255), random().nextInt(255));
     }
@@ -39,7 +40,7 @@ public class ScreenSaverConf {
         while (true) {
             ColorFrame colorFrame = context.getBean(ColorFrame.class);
             colorFrame.moveToRandomLocation();
-            Thread.sleep(50);
+            Thread.sleep(3000);
         }
     }
 }
